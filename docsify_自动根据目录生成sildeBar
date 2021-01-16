@@ -1,0 +1,44 @@
+# 项目相对路径，如果没有项目名则不需要配置
+projectName=projectName
+# 项目绝对路径
+abs_path="/data/app/nginx/html/projectName"
+
+function generate_slideBar(){
+                 flist=`ls $1`
+                  cd $1
+                  rm -rf _sidebar.md
+                 if [ ! -f "README.md" ]
+                        then
+                        echo "# ${f}" > README.md
+                 fi
+                  #echo $flist
+                  for f in $flist
+                  do
+                        pwds=`pwd`
+                        dir=`echo ${pwds} | sed "s|${abs_path}||"`
+                        if test -d $f
+                        then
+                          echo "- [> ${f}](${dir}/${f}/)" >> _sidebar.md
+                          generate_slideBar $f
+                        else
+                          #echo "file:$f"
+                          if [[ ${f} != "index.html" ]]\
+                                && [[ ${f} != "README.md" ]]\
+                                && [[ ${f} != "_coverpage.md" ]]\
+                                && [[ ${f#*.} != "js" ]]\
+                                && [[ ${f#*.} != "html" ]]\
+                                && [[ ${f#*.} != "png" ]]\
+                                && [[ ${f} != "_sidebar.md" ]]
+                                then
+                                if  [[ ${f##*.} != "md" ]] ;then
+                                        echo "- [${f}](/${projectName}/${dir}/${f})" >> _sidebar.md
+                                else
+                                        echo "- [${f%.*}](${dir}/${f%.*})" >> _sidebar.md
+                                fi
+                          fi
+                        fi
+                  done
+                  cd ../
+}
+
+generate_slideBar $abs_path
